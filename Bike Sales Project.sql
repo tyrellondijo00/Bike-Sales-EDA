@@ -111,3 +111,129 @@ ORDER BY Country
 
 -- SALES NUMBERS
 
+SELECT SUM(Revenue) AS TotalRevenue, SUM(Cost) AS TotalCost, SUM(Profit) AS TotalProfit
+FROM Sales
+
+--Breakdown By Country
+
+SELECT Country, SUM (Profit) AS TotalProfit, ROUND(SUM(Profit) * 100.0 / SUM(SUM(Profit)) OVER () , 0) AS PercentageOfTotal
+FROM Sales
+GROUP BY Country
+ORDER BY TotalProfit DESC
+
+SELECT Country, SUM (Revenue) AS TotalRevenue, ROUND(SUM(Revenue) * 100.0 / SUM(SUM(Revenue)) OVER () , 0) AS PercentageOfTotal
+FROM Sales
+GROUP BY Country
+ORDER BY TotalRevenue DESC
+
+SELECT Country, SUM (Cost) AS TotalCost, ROUND(SUM(Cost) * 100.0 / SUM(SUM(Cost)) OVER () , 0) AS PercentageOfTotal
+FROM Sales
+GROUP BY Country
+ORDER BY TotalCost DESC
+
+--Breakdown By Year
+
+SELECT Year, SUM (Profit) AS TotalProfit, ROUND(SUM(Profit) * 100.0 / SUM(SUM(Profit)) OVER () , 0) AS PercentageOfTotal
+FROM Sales
+GROUP BY Year
+ORDER BY TotalProfit DESC
+
+SELECT Year, SUM (Revenue) AS TotalRevenue, ROUND(SUM(Revenue) * 100.0 / SUM(SUM(Revenue)) OVER () , 0) AS PercentageOfTotal
+FROM Sales
+GROUP BY Year
+ORDER BY TotalRevenue DESC
+
+SELECT Year, SUM (Cost) AS TotalCost, ROUND(SUM(Cost) * 100.0 / SUM(SUM(Cost)) OVER () , 0) AS PercentageOfTotal
+FROM Sales
+GROUP BY Year
+ORDER BY TotalCost DESC
+
+
+-- Numbers Per Category
+
+SELECT Product_Category, SUM (Profit) AS TotalProfit, ROUND(SUM(Profit) * 100.0 / SUM(SUM(Profit)) OVER () , 0) AS PercentageOfProfits, ROUND(CAST(COUNT(Product_Category) * 100.0 / SUM(COUNT(Product_Category)) OVER () AS decimal), 2) AS PercentageOfSales
+FROM Sales
+GROUP BY Product_Category
+ORDER BY TotalProfit DESC
+
+SELECT Product_Category, SUM (Revenue) AS TotalRevenue, ROUND(SUM(Revenue) * 100.0 / SUM(SUM(Revenue)) OVER () , 0) AS PercentageOfRevenue, ROUND(CAST(COUNT(Product_Category) * 100.0 / SUM(COUNT(Product_Category)) OVER () AS decimal), 2) AS PercentageOfSales
+FROM Sales
+GROUP BY Product_Category
+ORDER BY TotalRevenue DESC
+
+SELECT Product_Category, SUM (Cost) AS TotalCost, ROUND(SUM(Cost) * 100.0 / SUM(SUM(Cost)) OVER () , 0) AS PercentageOfCosts, ROUND(CAST(COUNT(Product_Category) * 100.0 / SUM(COUNT(Product_Category)) OVER () AS decimal), 2) AS PercentageOfSales
+FROM Sales
+GROUP BY Product_Category
+ORDER BY TotalCost DESC
+
+
+--Numbers Per Country
+
+SELECT Country, SUM (Profit) AS TotalProfit, ROUND(SUM(Profit) * 100.0 / SUM(SUM(Profit)) OVER () , 0) AS PercentageOfProfits, ROUND(CAST(COUNT(Country) * 100.0 / SUM(COUNT(Country)) OVER () AS decimal), 2) AS PercentageOfSales
+FROM Sales
+GROUP BY Country
+ORDER BY TotalProfit DESC
+
+
+SELECT Country, ROUND(SUM(Profit) * 100.0 / SUM(SUM(Profit)) OVER () , 0) AS PercentageOfProfits, ROUND(SUM(Revenue) * 100.0 / SUM(SUM(Revenue)) OVER () , 0) AS PercentageOfRevenue, ROUND(SUM(Cost) * 100.0 / SUM(SUM(Cost)) OVER () , 0) AS PercentageOfCosts,  ROUND(CAST(COUNT(Country) * 100.0 / SUM(COUNT(Country)) OVER () AS decimal), 2) AS PercentageOfSales
+FROM Sales
+GROUP BY Country
+ORDER BY Country DESC
+
+
+--Numbers Per Year
+
+SELECT Year, SUM (Profit) AS TotalProfit, ROUND(SUM(Profit) * 100.0 / SUM(SUM(Profit)) OVER () , 0) AS PercentageOfProfits
+FROM Sales
+GROUP BY Year
+ORDER BY TotalProfit DESC
+
+
+SELECT Year, ROUND(SUM(Profit) * 100.0 / SUM(SUM(Profit)) OVER () , 0) AS PercentageOfProfits, ROUND(SUM(Revenue) * 100.0 / SUM(SUM(Revenue)) OVER () , 0) AS PercentageOfRevenue, ROUND(SUM(Cost) * 100.0 / SUM(SUM(Cost)) OVER () , 0) AS PercentageOfCosts,  ROUND(CAST(COUNT(Country) * 100.0 / SUM(COUNT(Country)) OVER () AS decimal), 2) AS PercentageOfSales
+FROM Sales
+GROUP BY Year
+ORDER BY PercentageOfProfits DESC
+
+
+-- Most Profitable Product in Each Country #CTE
+
+WITH RankedProducts AS (
+  SELECT Country,Product, SUM(Profit) AS Profit,
+		ROW_NUMBER() OVER (PARTITION BY Country ORDER BY SUM(Profit) DESC) AS Rank
+  FROM Sales
+  GROUP BY Country, Product
+)
+
+SELECT Country, Product AS MostProfitable, Profit AS ProfitMade
+FROM RankedProducts
+WHERE Rank = 1
+ORDER BY ProfitMade DESC
+
+
+--BREAKDOWN BY COUNTRY
+--(UNITED STATES)
+
+SELECT *
+FROM Sales
+WHERE Country = 'United States'
+
+
+-- Most Profitable Product in Each Age Group
+
+WITH RankedProducts AS (
+  SELECT Age_Group,Product, SUM(Profit) AS Profit,
+		ROW_NUMBER() OVER (PARTITION BY Age_Group ORDER BY SUM(Profit) DESC) AS Rank
+  FROM Sales
+  GROUP BY Age_Group, Product
+)
+
+SELECT Age_Group, Product AS MostProfitable, Profit AS ProfitMade
+FROM RankedProducts
+WHERE Rank = 1
+ORDER BY ProfitMade DESC
+
+
+
+
+
+
